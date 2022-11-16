@@ -10,11 +10,20 @@ local _temperatureYellow = 600  -- Slightly Hot
 local _temperatureOrange = 1000 -- Very Hot.
 local _temperatureRed = 1200    -- Hotness Levels Critical (whew)
 
---- Internal Max Values
+--- Reactor Max Values
 local _maxCoolant = adapter.getCoolantCapacity()
 local _maxFuel = adapter.getFuelCapacity()
 local _maxHeatedCoolant = adapter.getHeatedCoolantCapacity()
 local _maxWaste = adapter.getWasteCapacity()
+
+--- Item Names
+local _itemNames = {
+    ["minecraft:water"] = "Water",
+    ["mekanism:sodium"] = "Sodium",
+    ["mekanism:fissile_fuel"] = "Fissile Fuel",
+    ["mekanism:nuclear_waste"] = "Nuclear Waste",
+    ["minecraft:empty"] = "Empty"
+}
 
 --- Reactor object (internal values, object methods)
 local reactor = {
@@ -27,7 +36,7 @@ local reactor = {
     fuel = {},
     heatedCoolant = {},
     waste = {},
-    temperature = 0,
+    temperature = 0.0,
 }
 
 function reactor:updateValues()
@@ -38,17 +47,51 @@ function reactor:updateValues()
     self.temperature = adapter.getTemperature()
 end
 
+function reactor:getCoolantName()
+    return _itemNames[self.coolant.name]
+end
+
+function reactor:getFuelName()
+    return _itemNames[self.fuel.name]
+end
+
+function reactor:getHeatedCoolantName()
+    return _itemNames[self.heatedCoolant.name]
+end
+
+function reactor:getWasteName()
+    return _itemNames[self.waste.name]
+end
+
 --- Main Frame
 local mainFrame = basalt.createFrame()
                         :setMonitor(peripheral.getName(monitor))
                         :setMonitorScale(0.5)
-                        :setBackgroundColor(colors.black)
+                        :setBackground(colors.black)
 
 
 --- Values Frame
 local valuesFrame = mainFrame:addFrame()
-                            :setPosition(49,1)
-                            :setSize(50,38)
+                            :setPosition(69,1)
+                            :setSize(32,38)
+                            :setTheme({
+                                LabelGB = colors.gray,
+                                LabelText = colors.white
+                            })
+    
+    --- Coolant
+    local coolantTitle = valuesFrame:addLabel()
+                                :setPosition(2,2)
+                                :setText("Coolant")
+                                :setFontSize(2)
+    
+    local coolantName = valuesFrame:addLabel()
+                                :setPosition(4,5)
+                                :setText(reactor:getCoolantName())
+    
+    local coolantValue = valuesFrame:addLabel()
+                                :setPosition(3,6)
+                                :setText(string.format("%d/%d", reactor.coolant.value, _maxCoolant))
 
 
 basalt.autoUpdate()
