@@ -42,12 +42,8 @@ local mainFrame = basalt.createFrame()
 
 --- Values Frame
 local valuesFrame = mainFrame:addFrame()
-                            :setPosition(15,1)
-                            :setSize(12,15)
-
-local textLabel = mainFrame:addLabel()
-                        :setPosition(100,1)
-                        :setText("a")
+                            :setPosition(84,1)
+                            :setSize(25,38)
 
 --- Coolant
 local coolantFrame
