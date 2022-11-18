@@ -116,31 +116,44 @@ local valuesFrame = mainFrame:addFrame()
     --- Heated Coolant
     local coolantTitle = valuesFrame:addLabel()
                                 :setPosition(2,18)
-                                :setText("Heated Coolant")
+                                :setText("Heated")
+                                :setFontSize(2)
+                                :setBackground(colors.gray)
+
+                                
+    local coolantTitle = valuesFrame:addLabel()
+                                :setPosition(2,20)
+                                :setText("Coolant")
                                 :setFontSize(2)
                                 :setBackground(colors.gray)
 
     local coolantName = valuesFrame:addLabel()
-                                :setPosition(5,22)
+                                :setPosition(5,24)
                                 :setText(reactor:getHeatedCoolantName())
 
     local coolantValue = valuesFrame:addLabel()
-                                :setPosition(4,23)
+                                :setPosition(4,25)
                                 :setText(string.format("%d/%d", reactor.heatedCoolant.amount, _maxHeatedCoolant))
 
     --- Waste
     local wasteTitle = valuesFrame:addLabel()
-                                :setPosition(2,26)
-                                :setText("Nuclear Waste")
+                                :setPosition(2,28)
+                                :setText("Nuclear")
+                                :setFontSize(2)
+                                :setBackground(colors.gray)
+                     
+    local wasteTitle2 = valuesFrame:addLabel()
+                                :setPosition(2,30)
+                                :setText("Waste")
                                 :setFontSize(2)
                                 :setBackground(colors.gray)
 
     local wasteName = valuesFrame:addLabel()
-                                :setPosition(5,30)
+                                :setPosition(5,34)
                                 :setText(reactor:getWasteName())
 
     local wasteValue = valuesFrame:addLabel()
-                                :setPosition(4,31)
+                                :setPosition(4,35)
                                 :setText(string.format("%d/%d", reactor.waste.amount, _maxWaste))
 
 basalt.autoUpdate()
