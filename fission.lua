@@ -122,38 +122,38 @@ local valuesFrame = mainFrame:addFrame()
 
                                 
     local coolantTitle = valuesFrame:addLabel()
-                                :setPosition(2,20)
+                                :setPosition(2,21)
                                 :setText("Coolant")
                                 :setFontSize(2)
                                 :setBackground(colors.gray)
 
     local coolantName = valuesFrame:addLabel()
-                                :setPosition(5,24)
+                                :setPosition(5,25)
                                 :setText(reactor:getHeatedCoolantName())
 
     local coolantValue = valuesFrame:addLabel()
-                                :setPosition(4,25)
+                                :setPosition(4,26)
                                 :setText(string.format("%d/%d", reactor.heatedCoolant.amount, _maxHeatedCoolant))
 
     --- Waste
     local wasteTitle = valuesFrame:addLabel()
-                                :setPosition(2,28)
+                                :setPosition(2,29)
                                 :setText("Nuclear")
                                 :setFontSize(2)
                                 :setBackground(colors.gray)
                      
     local wasteTitle2 = valuesFrame:addLabel()
-                                :setPosition(2,30)
+                                :setPosition(2,32)
                                 :setText("Waste")
                                 :setFontSize(2)
                                 :setBackground(colors.gray)
 
     local wasteName = valuesFrame:addLabel()
-                                :setPosition(5,34)
+                                :setPosition(5,36)
                                 :setText(reactor:getWasteName())
 
     local wasteValue = valuesFrame:addLabel()
-                                :setPosition(4,35)
+                                :setPosition(4,37)
                                 :setText(string.format("%d/%d", reactor.waste.amount, _maxWaste))
 
 basalt.autoUpdate()
