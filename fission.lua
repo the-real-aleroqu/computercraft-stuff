@@ -22,7 +22,8 @@ local _itemNames = {
     ["mekanism:sodium"] = "Sodium",
     ["mekanism:fissile_fuel"] = "Fissile Fuel",
     ["mekanism:nuclear_waste"] = "Nuclear Waste",
-    ["minecraft:empty"] = "Empty"
+    ["minecraft:empty"] = "Empty",
+    ["mekanism:empty"] = "Empty"
 }
 
 --- Reactor object (internal values, object methods)
@@ -63,6 +64,9 @@ function reactor:getWasteName()
     return _itemNames[self.waste.name]
 end
 
+--- Initial Reactor Update
+reactor:updateValues()
+
 --- Main Frame
 local mainFrame = basalt.createFrame()
                         :setMonitor(peripheral.getName(monitor))
@@ -78,20 +82,65 @@ local valuesFrame = mainFrame:addFrame()
                                 LabelGB = colors.gray,
                                 LabelText = colors.white
                             })
-    
+
     --- Coolant
     local coolantTitle = valuesFrame:addLabel()
                                 :setPosition(2,2)
                                 :setText("Coolant")
                                 :setFontSize(2)
-    
-    local coolantName = valuesFrame:addLabel()
-                                :setPosition(4,5)
-                                :setText(reactor:getCoolantName())
-    
-    local coolantValue = valuesFrame:addLabel()
-                                :setPosition(3,6)
-                                :setText(string.format("%d/%d", reactor.coolant.value, _maxCoolant))
+                                :setBackground(colors.gray) -- Rezising resets background color... for some reason
 
+    local coolantName = valuesFrame:addLabel()
+                                :setPosition(5,6)
+                                :setText(reactor:getCoolantName())
+
+    local coolantValue = valuesFrame:addLabel()
+                                :setPosition(4,7)
+                                :setText(string.format("%d/%d", reactor.coolant.amount, _maxCoolant))
+
+    --- Fuel
+    local coolantTitle = valuesFrame:addLabel()
+                                :setPosition(2,10)
+                                :setText("Fuel")
+                                :setFontSize(2)
+                                :setBackground(colors.gray)
+
+    local coolantName = valuesFrame:addLabel()
+                                :setPosition(5,14)
+                                :setText(reactor:getFuelName())
+
+    local coolantValue = valuesFrame:addLabel()
+                                :setPosition(4,15)
+                                :setText(string.format("%d/%d", reactor.fuel.amount, _maxFuel))
+
+    --- Heated Coolant
+    local coolantTitle = valuesFrame:addLabel()
+                                :setPosition(2,18)
+                                :setText("Heated Coolant")
+                                :setFontSize(2)
+                                :setBackground(colors.gray)
+
+    local coolantName = valuesFrame:addLabel()
+                                :setPosition(5,22)
+                                :setText(reactor:getHeatedCoolantName())
+
+    local coolantValue = valuesFrame:addLabel()
+                                :setPosition(4,23)
+                                :setText(string.format("%d/%d", reactor.heatedCoolant.amount, _maxHeatedCoolant))
+
+    --- Waste
+    local wasteTitle = valuesFrame:addLabel()
+                                :setPosition(2,26)
+                                :setText("Nuclear Waste")
+                                :setFontSize(2)
+                                :setBackground(colors.gray)
+
+    local wasteName = valuesFrame:addLabel()
+                                :setPosition(5,30)
+                                :setText(reactor:getWasteName())
+
+    local wasteValue = valuesFrame:addLabel()
+                                :setPosition(4,31)
+                                :setText(string.format("%d/%d", reactor.waste.amount, _maxWaste))
 
 basalt.autoUpdate()
