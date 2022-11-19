@@ -84,6 +84,10 @@ local mainFrame = basalt.createFrame()
                     :setMonitor(peripheral.getName(monitor))
                     :setMonitorScale(0.5)
                     :setBackground(colors.black)
+                    :setTheme({
+                        LabelGB = colors.black,
+                        LabelText = colors.white
+                    })
 
     --- Title
     local mainTitle = mainFrame:addLabel()                  
@@ -97,26 +101,24 @@ local mainFrame = basalt.createFrame()
 local valuesFrame = mainFrame:addFrame()
                             :setPosition(69,1)
                             :setSize(32,38)
-                            :setTheme({
-                                LabelGB = colors.gray,
-                                LabelText = colors.white
-                            })
 
     --- Coolant
     local coolantTitle = valuesFrame:addLabel()
                                 :setPosition(2,2)
                                 :setText("Coolant")
                                 :setFontSize(2)
-                                :setBackground(colors.gray) -- Rezising resets background color... for some reason
+                                :setBackground(colors.gray) -- Tried using setTheme on valuesFrame but mainFrame takes priority
 
     local coolantName = valuesFrame:addLabel()
                                 :setPosition(5,6)
                                 :setText(reactor:getCoolantName())
+                                :setBackground(colors.gray)
 
     local coolantValue = valuesFrame:addLabel()
                                 :setPosition(4,7)
                                 :setForeground(valueLevelColor(reactor.coolantLevel))
                                 :setText(string.format("%d/%d", reactor.coolant.amount, _maxCoolant))
+                                :setBackground(colors.gray)
 
     --- Fuel
     local coolantTitle = valuesFrame:addLabel()
@@ -128,11 +130,13 @@ local valuesFrame = mainFrame:addFrame()
     local coolantName = valuesFrame:addLabel()
                                 :setPosition(5,14)
                                 :setText(reactor:getFuelName())
+                                :setBackground(colors.gray)
 
     local coolantValue = valuesFrame:addLabel()
                                 :setPosition(4,15)
-                                :setForeground(valueLevelColor(reactor.fuelLevel))
                                 :setText(string.format("%d/%d", reactor.fuel.amount, _maxFuel))
+                                :setBackground(colors.gray)
+                                :setForeground(valueLevelColor(reactor.fuelLevel))
 
     --- Heated Coolant
     local heatedCoolantTitle = valuesFrame:addLabel()
@@ -151,11 +155,13 @@ local valuesFrame = mainFrame:addFrame()
     local heatedCoolantName = valuesFrame:addLabel()
                                 :setPosition(5,25)
                                 :setText(reactor:getHeatedCoolantName())
+                                :setBackground(colors.gray)
 
     local heatedCoolantValue = valuesFrame:addLabel()
                                 :setPosition(4,26)
-                                :setForeground(valueLevelColor(reactor.heatedCoolantLevel))
                                 :setText(string.format("%d/%d", reactor.heatedCoolant.amount, _maxHeatedCoolant))
+                                :setBackground(colors.gray)
+                                :setForeground(valueLevelColor(reactor.heatedCoolantLevel))
 
     --- Waste
     local wasteTitle = valuesFrame:addLabel()
@@ -173,13 +179,18 @@ local valuesFrame = mainFrame:addFrame()
     local wasteName = valuesFrame:addLabel()
                                 :setPosition(5,36)
                                 :setText(reactor:getWasteName())
+                                :setBackground(colors.gray)
 
     local wasteValue = valuesFrame:addLabel()
                                 :setPosition(4,37)
                                 :setForeground(valueLevelColor(100 - reactor.wasteLevel))
                                 :setText(string.format("%d/%d", reactor.waste.amount, _maxWaste))
+                                :setBackground(colors.gray)
+                                :setForeground(valueLevelColor(100 - reactor.wasteLevel))
 
 while true do
+    os.startTimer(0.8)  -- Basalt works event wise, create a timer loop to update values every now and then
     reactor:updateValues()
-    basalt.update()
+    local ev = table.pack(os.pullEvent())
+    basalt.update(table.unpack(ev))
 end
