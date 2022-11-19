@@ -246,12 +246,6 @@ local valuesFrame = mainFrame:addFrame()
 
 
 --- Main Code
-
-basalt.onEvent(function(event)
-
-    print(event)
-end)
-
 parallel.waitForAll(basalt.autoUpdate(),
 function()
     -- Update reactor object
