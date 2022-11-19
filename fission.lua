@@ -51,9 +51,11 @@ local reactor = {
     heatedCoolant = {},
     waste = {},
     temperature = 0.0,
+    burnRate = 0.0
 }
 
 function reactor:updateValues()
+    self.status = adapter.getStatus()
     self.coolant = adapter.getCoolant()
     self.coolantLevel = math.floor(adapter.getCoolantFilledPercentage() * 100)
     self.fuel = adapter.getFuel()
@@ -63,6 +65,7 @@ function reactor:updateValues()
     self.waste = adapter.getWaste()
     self.wasteLevel = math.floor(adapter.getWasteFilledPercentage() * 100)
     self.temperature = adapter.getTemperature()
+    self.burnRate = adapter.getBurnRate()
 end
 
 function reactor:getCoolantName()
@@ -79,6 +82,10 @@ end
 
 function reactor:getWasteName()
     return _itemNames[self.waste.name]
+end
+
+function reactor:temperaturePercentage()
+    return math.floor(180000 / self.temperature)    -- Returns percentage for the temperature bar (0-100)
 end
 
 local function temperatureColor()
@@ -120,7 +127,7 @@ local mainFrame = basalt.createFrame()
                                 :setSize(14,5)
                                 :setText(_button.text[reactor.status])
                                 :setBackground(_button.color[reactor.status])
-                                :setFontSize(2)
+                                :setBorder(colors.white)
                                 :onClick(function(self)
                                     if reactor.status == false then
                                         adapter.activate()
@@ -133,6 +140,7 @@ local mainFrame = basalt.createFrame()
                                     self:setBackground(_button.color[reactor.status])
                                 end)
 
+    --- Temperature
     local temperatureLabel = mainFrame:addLabel()
                                 :setPosition(3,17)
                                 :setText("Temperature:")
@@ -146,8 +154,13 @@ local mainFrame = basalt.createFrame()
 
     local temperatureBar = mainFrame:addProgressbar()
                                 :setPosition(2,22)
-                                :setSize()
+                                :setSize(64,2)
+                                :setProgress(reactor:temperaturePercentage())
                                 :setForeground(temperatureColor())
+
+    --- Burn Rate
+    local burnRateTitle = mainFrame:addLabel()
+                                :setPosition(2,25)
 
 --- Values Frame
 local valuesFrame = mainFrame:addFrame()
@@ -170,8 +183,8 @@ local valuesFrame = mainFrame:addFrame()
 
     local coolantValue = valuesFrame:addLabel()
                                 :setPosition(4,7)
-                                :setForeground(valueLevelColor(reactor.coolantLevel))
                                 :setText(string.format("%d/%d", reactor.coolant.amount, _maxCoolant))
+                                :setForeground(valueLevelColor(reactor.coolantLevel))
 
     --- Fuel
     local fuelTitle = valuesFrame:addLabel()
@@ -207,7 +220,7 @@ local valuesFrame = mainFrame:addFrame()
     local heatedCoolantValue = valuesFrame:addLabel()
                                 :setPosition(4,26)
                                 :setText(string.format("%d/%d", reactor.heatedCoolant.amount, _maxHeatedCoolant))
-                                :setForeground(valueLevelColor(reactor.heatedCoolantLevel))
+                                :setForeground(valueLevelColor(100 - reactor.heatedCoolantLevel))
 
     --- Waste
     local wasteTitle = valuesFrame:addLabel()
@@ -226,7 +239,6 @@ local valuesFrame = mainFrame:addFrame()
 
     local wasteValue = valuesFrame:addLabel()
                                 :setPosition(4,37)
-                                :setForeground(valueLevelColor(100 - reactor.wasteLevel))
                                 :setText(string.format("%d/%d", reactor.waste.amount, _maxWaste))
                                 :setForeground(valueLevelColor(100 - reactor.wasteLevel))
 
