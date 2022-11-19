@@ -40,24 +40,32 @@ local _button = {
 }
 
 --- Reactor object (internal values, object methods)
-local reactor = {
+
 -- adapter.getCoolant() ->
 --      {
 --          name = "minecraft:water",
 --          amount = 119523556
 --      }
+
+local reactor = {
     status = false,
+    temperature = 0.0,
+    damage = 0,
+    burnRate = 0.0,
     coolant = {},
     coolantLevel = 0,
     fuel = {},
+    fuelLevel = 0,
     heatedCoolant = {},
+    heatedCoolantLevel = 0,
     waste = {},
-    temperature = 0.0,
-    burnRate = 0.0
+    wasteLevel = 0
 }
 
 function reactor:updateValues()
     self.status = adapter.getStatus()
+    self.temperature = adapter.getTemperature()
+    self.burnRate = adapter.getBurnRate()
     self.coolant = adapter.getCoolant()
     self.coolantLevel = math.floor(adapter.getCoolantFilledPercentage() * 100)
     self.fuel = adapter.getFuel()
@@ -66,8 +74,6 @@ function reactor:updateValues()
     self.heatedCoolantLevel = math.floor(adapter.getHeatedCoolantFilledPercentage() * 100)
     self.waste = adapter.getWaste()
     self.wasteLevel = math.floor(adapter.getWasteFilledPercentage() * 100)
-    self.temperature = adapter.getTemperature()
-    self.burnRate = adapter.getBurnRate()
 end
 
 function reactor:getCoolantName()
@@ -94,6 +100,13 @@ local function temperatureColor()
     if reactor.temperature >= _temperatureRed then return colors.red end
     if reactor.temperature >= _temperatureOrange then return colors.orange end
     if reactor.temperature >= _temperatureYellow then return colors.yellow end
+    return colors.green
+end
+
+local function damageColor()
+    if reactor.damage > 25 then return colors.yellow end
+    if reactor.damage > 50 then return colors.orange end
+    if reactor.damage > 75 then return colors.red end -- big uh oh
     return colors.green
 end
 
@@ -125,16 +138,15 @@ local mainFrame = basalt.createFrame()
                                 :setFontSize(3)
 
     local startScramButton = mainFrame:addButton()
-                                :setPosition(26,12)
+                                :setPosition(28,12)
                                 :setSize(15,3)
                                 :setText(_button.text[reactor.status])
                                 :setBackground(_button.color[reactor.status])
                                 :onClick(function(self)
-                                    if reactor.status == false then
-                                        adapter.activate()
+                                    if pcall(adapter.activate) then
                                         reactor.status = true
                                     else
-                                        adapter.scram()
+                                        pcall(adapter.scram)
                                         reactor.status = false
                                     end
                                     self:setText(_button.text[reactor.status])
@@ -148,20 +160,27 @@ local mainFrame = basalt.createFrame()
                                 :setFontSize(2)
     
     local temperatureValue = mainFrame:addLabel()
-                                :setPosition(48,17)
-                                :setText(string.format("%.1fK", reactor.temperature))
+                                :setPosition(40,17)
+                                :setText(string.format("%7.1fK", reactor.temperature))
                                 :setForeground(temperatureColor())
                                 :setFontSize(2)
 
     local temperatureBar = mainFrame:addProgressbar()
-                                :setPosition(2,22)
+                                :setPosition(2,20)
                                 :setSize(64,2)
                                 :setProgress(reactor:temperaturePercentage())
                                 :setProgressBar(temperatureColor())
 
-    --- Burn Rate
-    local burnRateTitle = mainFrame:addLabel()
+    --- Damage
+    local damageLabel = mainFrame:addLabel()
                                 :setPosition(2,25)
+                                :setText("Damage:")
+                                :setFontSize(2)
+    
+    local damageValue = mainFrame:addLabel()
+                                :setPosition(24,25)
+                                :setText("100%")
+                                :setFontSize(2)
 
 --- Values Frame
 local valuesFrame = mainFrame:addFrame()
@@ -256,7 +275,7 @@ function()
         local coolantLevelColor = valueLevelColor(reactor.coolantLevel)
         local wasteLevelColor = valueLevelColor(100 - reactor.wasteLevel)
 
-        temperatureValue:setText(string.format("%.1fK", reactor.temperature))
+        temperatureValue:setText(string.format("%7.1fK", reactor.temperature))
                 :setForeground(temperatureColor)
         temperatureBar:setProgress(reactor:temperaturePercentage())
                 :setProgressBar(temperatureColor)
@@ -276,7 +295,7 @@ function()
         -- Failsafe
         if reactor.status then
             if temperatureColor == colors.red or coolantLevelColor == colors.red or wasteLevelColor == colors.red then
-                pcall(adapter.scram())
+                pcall(adapter.scram)
                 reactor.status = false
                 startScramButton:setText(_button.text[reactor.status])
                 startScramButton:setBackground(_button.color[reactor.status])
