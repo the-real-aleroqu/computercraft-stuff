@@ -22,7 +22,7 @@ local _itemNames = {
     ["mekanism:sodium"] = "Sodium",
     ["mekanism:fissile_fuel"] = "Fissile Fuel",
     ["mekanism:steam"] = "Steam",
-    ["mekanism:superheating_sodium"] = "Superheated Sodium",
+    ["mekanism:superheated_sodium"] = "Superheated Sodium",
     ["mekanism:nuclear_waste"] = "Nuclear Waste",
     ["minecraft:empty"] = "Empty",
     ["mekanism:empty"] = "Empty"
@@ -271,8 +271,10 @@ function()
                 :setForeground(wasteLevelColor)
 
         -- Failsafe
-        if temperatureColor == colors.red or wasteLevelColor == colors.red or coolantLevelColor == colors.red then
+        if reactor.status and temperatureColor == colors.red or coolantLevelColor == colors.red or wasteLevelColor == colors.red then
             adapter.scram()
+            startScramButton:setText(_button.text[reactor.status])
+            startScramButton:setBackground(_button.color[reactor.status])
         end
     end
 end)
