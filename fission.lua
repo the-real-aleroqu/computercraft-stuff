@@ -65,6 +65,7 @@ local reactor = {
 function reactor:updateValues()
     self.status = adapter.getStatus()
     self.temperature = adapter.getTemperature()
+    self.damage = adapter.getDamagePercentage()
     self.burnRate = adapter.getBurnRate()
     self.coolant = adapter.getCoolant()
     self.coolantLevel = math.floor(adapter.getCoolantFilledPercentage() * 100)
@@ -173,13 +174,14 @@ local mainFrame = basalt.createFrame()
 
     --- Damage
     local damageLabel = mainFrame:addLabel()
-                                :setPosition(2,25)
+                                :setPosition(3,25)
                                 :setText("Damage:")
                                 :setFontSize(2)
     
     local damageValue = mainFrame:addLabel()
-                                :setPosition(24,25)
-                                :setText("100%")
+                                :setPosition(25,25)
+                                :setText(string.format("%3d%%", reactor.damage))
+                                :setForeground(damageColor())
                                 :setFontSize(2)
 
 --- Values Frame
@@ -271,6 +273,7 @@ function()
         reactor:updateValues()
 
         -- Update Values on screen
+        local damageColor = damageColor() -- This variable will be used in the reactor restart
         local temperatureColor = temperatureColor() -- These 3 variables will be used in the failsafe
         local coolantLevelColor = valueLevelColor(reactor.coolantLevel)
         local wasteLevelColor = valueLevelColor(100 - reactor.wasteLevel)
@@ -279,6 +282,8 @@ function()
                 :setForeground(temperatureColor)
         temperatureBar:setProgress(reactor:temperaturePercentage())
                 :setProgressBar(temperatureColor)
+        damageValue:setText(string.format("%3d%%", reactor.damage))
+                :setForeground(damageColor)
         coolantName:setText(reactor:getCoolantName())
         coolantValue:setText(string.format("%d/%d", reactor.coolant.amount, _maxCoolant))
                 :setForeground(coolantLevelColor)
