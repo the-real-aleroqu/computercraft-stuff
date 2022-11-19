@@ -65,7 +65,7 @@ local reactor = {
 function reactor:updateValues()
     self.status = adapter.getStatus()
     self.temperature = adapter.getTemperature()
-    self.damage = adapter.getDamagePercentage()
+    self.damage = adapter.getDamagePercent()
     self.burnRate = adapter.getBurnRate()
     self.coolant = adapter.getCoolant()
     self.coolantLevel = math.floor(adapter.getCoolantFilledPercentage() * 100)
@@ -133,7 +133,7 @@ local mainFrame = basalt.createFrame()
                             })
 
     --- Title and Start/Scram Button
-    local mainTitle = mainFrame:addLabel()                  
+    local mainTitle = mainFrame:addLabel()
                                 :setPosition(2,2)
                                 :setText("Reactor")
                                 :setFontSize(3)
@@ -159,7 +159,7 @@ local mainFrame = basalt.createFrame()
                                 :setPosition(3,17)
                                 :setText("Temperature:")
                                 :setFontSize(2)
-    
+
     local temperatureValue = mainFrame:addLabel()
                                 :setPosition(40,17)
                                 :setText(string.format("%7.1fK", reactor.temperature))
@@ -177,7 +177,7 @@ local mainFrame = basalt.createFrame()
                                 :setPosition(3,25)
                                 :setText("Damage:")
                                 :setFontSize(2)
-    
+
     local damageValue = mainFrame:addLabel()
                                 :setPosition(25,25)
                                 :setText(string.format("%3d%%", reactor.damage))
@@ -229,7 +229,6 @@ local valuesFrame = mainFrame:addFrame()
                                 :setText("Heated")
                                 :setFontSize(2)
 
-                                
     local heatedCoolantTitle2 = valuesFrame:addLabel()
                                 :setPosition(2,21)
                                 :setText("Coolant")
@@ -249,7 +248,7 @@ local valuesFrame = mainFrame:addFrame()
                                 :setPosition(2,29)
                                 :setText("Nuclear")
                                 :setFontSize(2)
-                     
+
     local wasteTitle2 = valuesFrame:addLabel()
                                 :setPosition(2,32)
                                 :setText("Waste")
@@ -266,7 +265,7 @@ local valuesFrame = mainFrame:addFrame()
 
 
 --- Main Code
-parallel.waitForAny(basalt.autoUpdate, 
+parallel.waitForAny(basalt.autoUpdate,
 function()
     while true do
         -- Update reactor object
@@ -292,7 +291,7 @@ function()
                 :setForeground(valueLevelColor(reactor.fuelLevel))
         heatedCoolantName:setText(reactor:getHeatedCoolantName())
         heatedCoolantValue:setText(string.format("%d/%d", reactor.heatedCoolant.amount, _maxHeatedCoolant))
-                :setForeground(valueLevelColor(reactor.heatedCoolantLevel))
+                :setForeground(valueLevelColor(100 - reactor.heatedCoolantLevel))
         wasteName:setText(reactor:getWasteName())
         wasteValue:setText(string.format("%d/%d", reactor.waste.amount, _maxWaste))
                 :setForeground(wasteLevelColor)
@@ -302,6 +301,15 @@ function()
             if temperatureColor == colors.red or coolantLevelColor == colors.red or wasteLevelColor == colors.red then
                 pcall(adapter.scram)
                 reactor.status = false
+                startScramButton:setText(_button.text[reactor.status])
+                startScramButton:setBackground(_button.color[reactor.status])
+            end
+
+        -- Restart Reactor
+        else
+            if temperatureColor ~= colors.red and damageColor == colors.green then
+                pcall(adapter.activate)
+                reactor.status = true
                 startScramButton:setText(_button.text[reactor.status])
                 startScramButton:setBackground(_button.color[reactor.status])
             end
