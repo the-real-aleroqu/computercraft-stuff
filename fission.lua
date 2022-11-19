@@ -98,8 +98,8 @@ function reactor:getWasteName()
 end
 
 function reactor:addBurnRate(value)
-    local newBurnRate = self.burnRate + value
-    if pcall(adapter.setBurnRate(newBurnRate)) then
+    local newBurnRate = tonumber(string.format("%.1f",self.burnRate + value))
+    if pcall(function() adapter.setBurnRate(newBurnRate) end) then
         self.burnRate = newBurnRate
     end
 end
