@@ -246,32 +246,34 @@ local valuesFrame = mainFrame:addFrame()
 
 
 --- Main Code
-local function updateScreen()
-    
-end
-
-parallel.waitForAll(basalt.autoUpdate, 
+parallel.waitForAny(basalt.autoUpdate, 
 function()
     while true do
         -- Update reactor object
         reactor:updateValues()
 
         -- Update Values on screen
-        temperatureValue:setText(string.format("%.1fK", reactor.temperature))
-        temperatureBar:setProgress(reactor:temperaturePercentage())
-                :setProgressBar(temperatureColor())
+        local temperatureColor = temperatureColor() -- These 3 variables will be used in the failsafe
+        local coolantLevelColor = valueLevelColor(reactor.coolantLevel)
+        local wasteLevelColor = valueLevelColor(100 - reactor.wasteLevel)
 
-        coolantValue:setForeground(valueLevelColor(reactor.coolantLevel))
-                :setText(string.format("%d/%d", reactor.coolant.amount, _maxCoolant))
+        temperatureValue:setText(string.format("%.1fK", reactor.temperature))
+                :setForeground(temperatureColor)
+        temperatureBar:setProgress(reactor:temperaturePercentage())
+                :setProgressBar(temperatureColor)
+        coolantValue:setText(string.format("%d/%d", reactor.coolant.amount, _maxCoolant))
+                :setForeground(coolantLevelColor)
         fuelValue:setText(string.format("%d/%d", reactor.fuel.amount, _maxFuel))
                 :setForeground(valueLevelColor(reactor.fuelLevel))
         heatedCoolantValue:setText(string.format("%d/%d", reactor.heatedCoolant.amount, _maxHeatedCoolant))
                 :setForeground(valueLevelColor(reactor.heatedCoolantLevel))
         wasteValue:setText(string.format("%d/%d", reactor.waste.amount, _maxWaste))
-                :setForeground(valueLevelColor(100 - reactor.wasteLevel))
+                :setForeground(wasteLevelColor)
 
-        -- Sleep (calls coroutine.yield() at the end)
-        os.sleep(0.05)
+        -- Failsafe
+        if temperatureColor == colors.red or wasteLevelColor == colors.red or coolantLevelColor == colors.red then
+            adapter.scram()
+        end
     end
 end)
 
