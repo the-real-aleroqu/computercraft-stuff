@@ -77,6 +77,10 @@ function reactor:updateValues()
     self.wasteLevel = math.floor(adapter.getWasteFilledPercentage() * 100)
 end
 
+function reactor:temperaturePercentage()
+    return math.min(math.floor(self.temperature / 1800 * 100),100)    -- Returns percentage for the temperature bar (0-100)
+end
+
 function reactor:getCoolantName()
     return _itemNames[self.coolant.name]
 end
@@ -93,10 +97,6 @@ function reactor:getWasteName()
     return _itemNames[self.waste.name]
 end
 
-function reactor:temperaturePercentage()
-    return math.min(math.floor(self.temperature / 1800 * 100),100)    -- Returns percentage for the temperature bar (0-100)
-end
-
 local function temperatureColor()
     if reactor.temperature >= _temperatureRed then return colors.red end
     if reactor.temperature >= _temperatureOrange then return colors.orange end
@@ -104,18 +104,18 @@ local function temperatureColor()
     return colors.green
 end
 
+function reactor:addBurnRate(value)
+    local newBurnRate = self.burnRate + value
+    if pcall(adapter.setBurnRate(newBurnRate)) then
+        self.burnRate = newBurnRate
+    end
+end
+
 local function damageColor()
     if reactor.damage > 25 then return colors.yellow end
     if reactor.damage > 50 then return colors.orange end
     if reactor.damage > 75 then return colors.red end -- big uh oh
     return colors.green
-end
-
-local function addBurnRate(value)
-    local newBurnRate = reactor.burnRate + value
-    if pcall(adapter.setBurnRate(newBurnRate)) then
-        reactor.burnRate = newBurnRate
-    end
 end
 
 local function valueLevelColor(color)
@@ -207,7 +207,7 @@ local mainFrame = basalt.createFrame()
                                 :setSize(3,1)
                                 :setText("<<")
                                 :onClick(function()
-                                    adapter:addBurnRate(-1)
+                                    reactor:addBurnRate(-1)
                                     burnRateValue:setText(string.format("%.1f", reactor.burnRate))
                                 end)
     local rateSmallDecrement = mainFrame:addButton()
@@ -215,7 +215,7 @@ local mainFrame = basalt.createFrame()
                                 :setSize(3,1)
                                 :setText("<")
                                 :onClick(function()
-                                    adapter:addBurnRate(-0.1)
+                                    reactor:addBurnRate(-0.1)
                                     burnRateValue:setText(string.format("%.1f", reactor.burnRate))
                                 end)
 
@@ -224,7 +224,7 @@ local mainFrame = basalt.createFrame()
                                 :setSize(3,1)
                                 :setText(">")
                                 :onClick(function()
-                                    adapter:addBurnRate(0.1)
+                                    reactor:addBurnRate(0.1)
                                     burnRateValue:setText(string.format("%.1f", reactor.burnRate))
                                 end)
     local rateBigIncrement = mainFrame:addButton()
@@ -232,7 +232,7 @@ local mainFrame = basalt.createFrame()
                                 :setSize(3,1)
                                 :setText(" >>")
                                 :onClick(function()
-                                    adapter:addBurnRate(1)
+                                    reactor:addBurnRate(1)
                                     burnRateValue:setText(string.format("%.1f", reactor.burnRate))
                                 end)
 
