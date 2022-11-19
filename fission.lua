@@ -116,7 +116,7 @@ local mainFrame = basalt.createFrame()
                                 ButtonText = colors.white
                             })
 
-    --- Title
+    --- Title and Start/Scram Button
     local mainTitle = mainFrame:addLabel()                  
                                 :setPosition(2,2)
                                 :setText("Reactor")
@@ -156,7 +156,7 @@ local mainFrame = basalt.createFrame()
                                 :setPosition(2,22)
                                 :setSize(64,2)
                                 :setProgress(reactor:temperaturePercentage())
-                                :setForeground(temperatureColor())
+                                :setProgressBar(temperatureColor())
 
     --- Burn Rate
     local burnRateTitle = mainFrame:addLabel()
@@ -244,9 +244,17 @@ local valuesFrame = mainFrame:addFrame()
 
 
 --- Main Code
+
+basalt.onEvent(function(event)
+    print(event)
+    if (event == "terminate") then
+        return false
+    end
+end)
+
 while true do
     os.startTimer(0.8)  -- Basalt works event wise, create a timer loop to update values every now and then
-    
+
     -- Update reactor object
     reactor:updateValues()
 
@@ -264,6 +272,6 @@ while true do
 
 
 
-    local ev = table.pack(os.pullEvent())
+    local ev = table.pack(os.pullEventRaw())
     basalt.update(table.unpack(ev))
 end
