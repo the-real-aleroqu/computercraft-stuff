@@ -111,6 +111,13 @@ local function damageColor()
     return colors.green
 end
 
+local function addBurnRate(value)
+    local newBurnRate = reactor.burnRate + value
+    if pcall(adapter.setBurnRate(newBurnRate)) then
+        reactor.burnRate = newBurnRate
+    end
+end
+
 local function valueLevelColor(color)
     if color < 5 then return colors.red end
     if color < 25 then return colors.orange end
@@ -196,21 +203,38 @@ local mainFrame = basalt.createFrame()
                                 :setFontSize(2)
 
     local rateBigDecrement = mainFrame:addButton()
-                                :setPosition(5,34)
-                                :setSize(3,2)
+                                :setPosition(10,33)
+                                :setSize(3,1)
                                 :setText("<<")
+                                :onClick(function()
+                                    adapter:addBurnRate(-1)
+                                    burnRateValue:setText(string.format("%.1f", reactor.burnRate))
+                                end)
     local rateSmallDecrement = mainFrame:addButton()
-                                :setPosition(9,34)
-                                :setSize(3,2)
+                                :setPosition(14,33)
+                                :setSize(3,1)
                                 :setText("<")
+                                :onClick(function()
+                                    adapter:addBurnRate(-0.1)
+                                    burnRateValue:setText(string.format("%.1f", reactor.burnRate))
+                                end)
+
     local rateSmallIncrement = mainFrame:addButton()
-                                :setPosition(16,34)
-                                :setSize(3,2)
+                                :setPosition(21,33)
+                                :setSize(3,1)
                                 :setText(">")
+                                :onClick(function()
+                                    adapter:addBurnRate(0.1)
+                                    burnRateValue:setText(string.format("%.1f", reactor.burnRate))
+                                end)
     local rateBigIncrement = mainFrame:addButton()
-                                :setPosition(20,34)
-                                :setSize(3,2)
-                                :setText(">>")
+                                :setPosition(25,33)
+                                :setSize(3,1)
+                                :setText(" >>")
+                                :onClick(function()
+                                    adapter:addBurnRate(1)
+                                    burnRateValue:setText(string.format("%.1f", reactor.burnRate))
+                                end)
 
 --- Values Frame
 local valuesFrame = mainFrame:addFrame()
