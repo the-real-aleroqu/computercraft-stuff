@@ -252,26 +252,28 @@ basalt.onEvent(function(event)
     end
 end)
 
-while true do
-    os.startTimer(0.8)  -- Basalt works event wise, create a timer loop to update values every now and then
+basalt.autoUpdate()
 
-    -- Update reactor object
-    reactor:updateValues()
+-- while true do
+--     os.startTimer(0.8)  -- Basalt works event wise, create a timer loop to update values every now and then
 
-    -- Update Values on screen
-    coolantValue:setForeground(valueLevelColor(reactor.coolantLevel))
-    coolantValue:setText(string.format("%d/%d", reactor.coolant.amount, _maxCoolant))
-    fuelValue:setText(string.format("%d/%d", reactor.fuel.amount, _maxFuel))
-    fuelValue:setForeground(valueLevelColor(reactor.fuelLevel))
-    heatedCoolantValue:setText(string.format("%d/%d", reactor.heatedCoolant.amount, _maxHeatedCoolant))
-    heatedCoolantValue:setForeground(valueLevelColor(reactor.heatedCoolantLevel))
-    wasteValue:setText(string.format("%d/%d", reactor.waste.amount, _maxWaste))
-    wasteValue:setForeground(valueLevelColor(100 - reactor.wasteLevel))
+--     -- Update reactor object
+--     reactor:updateValues()
 
-    -- Failsafe
+--     -- Update Values on screen
+--     coolantValue:setForeground(valueLevelColor(reactor.coolantLevel))
+--     coolantValue:setText(string.format("%d/%d", reactor.coolant.amount, _maxCoolant))
+--     fuelValue:setText(string.format("%d/%d", reactor.fuel.amount, _maxFuel))
+--     fuelValue:setForeground(valueLevelColor(reactor.fuelLevel))
+--     heatedCoolantValue:setText(string.format("%d/%d", reactor.heatedCoolant.amount, _maxHeatedCoolant))
+--     heatedCoolantValue:setForeground(valueLevelColor(reactor.heatedCoolantLevel))
+--     wasteValue:setText(string.format("%d/%d", reactor.waste.amount, _maxWaste))
+--     wasteValue:setForeground(valueLevelColor(100 - reactor.wasteLevel))
+
+--     -- Failsafe
 
 
 
-    local ev = table.pack(os.pullEventRaw())
-    basalt.update(table.unpack(ev))
-end
+--     local ev = table.pack(os.pullEventRaw())
+--     basalt.update(table.unpack(ev))
+-- end
