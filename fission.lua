@@ -26,6 +26,11 @@ local _itemNames = {
     ["mekanism:empty"] = "Empty"
 }
 
+local _buttonText = {
+    [false] = "Start",
+    [true] = "SCRAM"
+}
+
 --- Reactor object (internal values, object methods)
 local reactor = {
 -- adapter.getCoolant() ->
@@ -33,6 +38,7 @@ local reactor = {
 --          name = "minecraft:water",
 --          amount = 119523556
 --      }
+    status = false,
     coolant = {},
     coolantLevel = 0,
     fuel = {},
@@ -69,6 +75,13 @@ function reactor:getWasteName()
     return _itemNames[self.waste.name]
 end
 
+function temperatureColor()
+    if reactor.temperature >= _temperatureRed then return colors.red end
+    if reactor.temperature >= _temperatureOrange then return colors.orange end
+    if reactor.temperature >= _temperatureYellow then return colors.yellow end
+    return colors.green
+end
+
 function valueLevelColor(color)
     if color < 5 then return colors.red end
     if color < 25 then return colors.orange end
@@ -81,26 +94,42 @@ reactor:updateValues()
 
 --- Main Frame
 local mainFrame = basalt.createFrame()
-                    :setMonitor(peripheral.getName(monitor))
-                    :setMonitorScale(0.5)
-                    :setBackground(colors.black)
-                    :setTheme({
-                        LabelBG = colors.black,
-                        LabelText = colors.white
-                    })
+                            :setMonitor(peripheral.getName(monitor))
+                            :setMonitorScale(0.5)
+                            :setBackground(colors.black)
+                            :setTheme({
+                                LabelBG = colors.black,
+                                LabelText = colors.white
+                            })
 
     --- Title
     local mainTitle = mainFrame:addLabel()                  
-                        :setPosition(2,2)
-                        :setText("Reactor")
-                        :setFontSize(3)
+                                :setPosition(2,2)
+                                :setText("Reactor")
+                                :setFontSize(3)
 
+    local startScramButton = mainFrame:addButton()
+                                :setPosition(3,8)
+                                :setSize(9,3)
+                                :setText(_buttonText[reactor.status])
 
+    local temperatureLabel = mainFrame:addLabel()
+                                :setPosition(3,12)
+                                :setText("Temperature:")
+    
+    local temperatureValue = mainFrame:addLabel()
+                                :setPosition(16,12)
+                                :setText(string.format("%.1fK", reactor.temperature))
+                                :setForeground(temperatureColor())
+
+    local temperatureBar = mainFrame:addProgressbar()
+                                :setPosition(2,13)
+                                :setForeground(temperatureColor())
 
 --- Values Frame
 local valuesFrame = mainFrame:addFrame()
-                            :setPosition(69,1)
-                            :setSize(32,38)
+                            :setPosition(74,1)
+                            :setSize(27,38)
                             :setTheme({
                                 LabelBG = colors.gray,
                                 LabelText = colors.white
@@ -111,35 +140,29 @@ local valuesFrame = mainFrame:addFrame()
                                 :setPosition(2,2)
                                 :setText("Coolant")
                                 :setFontSize(2)
-                                --:setBackground(colors.gray)
 
     local coolantName = valuesFrame:addLabel()
                                 :setPosition(5,6)
                                 :setText(reactor:getCoolantName())
-                                --:setBackground(colors.gray)
 
     local coolantValue = valuesFrame:addLabel()
                                 :setPosition(4,7)
                                 :setForeground(valueLevelColor(reactor.coolantLevel))
                                 :setText(string.format("%d/%d", reactor.coolant.amount, _maxCoolant))
-                                --:setBackground(colors.gray)
 
     --- Fuel
     local coolantTitle = valuesFrame:addLabel()
                                 :setPosition(2,10)
                                 :setText("Fuel")
                                 :setFontSize(2)
-                                --:setBackground(colors.gray)
 
     local coolantName = valuesFrame:addLabel()
                                 :setPosition(5,14)
                                 :setText(reactor:getFuelName())
-                                --:setBackground(colors.gray)
 
     local coolantValue = valuesFrame:addLabel()
                                 :setPosition(4,15)
                                 :setText(string.format("%d/%d", reactor.fuel.amount, _maxFuel))
-                                --:setBackground(colors.gray)
                                 :setForeground(valueLevelColor(reactor.fuelLevel))
 
     --- Heated Coolant
@@ -147,24 +170,20 @@ local valuesFrame = mainFrame:addFrame()
                                 :setPosition(2,18)
                                 :setText("Heated")
                                 :setFontSize(2)
-                                --:setBackground(colors.gray)
 
                                 
     local heatedCoolantTitle2 = valuesFrame:addLabel()
                                 :setPosition(2,21)
                                 :setText("Coolant")
                                 :setFontSize(2)
-                                --:setBackground(colors.gray)
 
     local heatedCoolantName = valuesFrame:addLabel()
                                 :setPosition(5,25)
                                 :setText(reactor:getHeatedCoolantName())
-                                --:setBackground(colors.gray)
 
     local heatedCoolantValue = valuesFrame:addLabel()
                                 :setPosition(4,26)
                                 :setText(string.format("%d/%d", reactor.heatedCoolant.amount, _maxHeatedCoolant))
-                                --:setBackground(colors.gray)
                                 :setForeground(valueLevelColor(reactor.heatedCoolantLevel))
 
     --- Waste
@@ -172,24 +191,20 @@ local valuesFrame = mainFrame:addFrame()
                                 :setPosition(2,29)
                                 :setText("Nuclear")
                                 :setFontSize(2)
-                                --:setBackground(colors.gray)
                      
     local wasteTitle2 = valuesFrame:addLabel()
                                 :setPosition(2,32)
                                 :setText("Waste")
                                 :setFontSize(2)
-                                --:setBackground(colors.gray)
 
     local wasteName = valuesFrame:addLabel()
                                 :setPosition(5,36)
                                 :setText(reactor:getWasteName())
-                                --:setBackground(colors.gray)
 
     local wasteValue = valuesFrame:addLabel()
                                 :setPosition(4,37)
                                 :setForeground(valueLevelColor(100 - reactor.wasteLevel))
                                 :setText(string.format("%d/%d", reactor.waste.amount, _maxWaste))
-                                --:setBackground(colors.gray)
                                 :setForeground(valueLevelColor(100 - reactor.wasteLevel))
 
 while true do
