@@ -247,26 +247,33 @@ local valuesFrame = mainFrame:addFrame()
 
 --- Main Code
 local function updateScreen()
+    
+end
+
+parallel.waitForAll(basalt.autoUpdate, 
+function()
     while true do
         -- Update reactor object
         reactor:updateValues()
 
         -- Update Values on screen
+        temperatureValue:setText(string.format("%.1fK", reactor.temperature))
+        temperatureBar:setProgress(reactor:temperaturePercentage())
+                :setProgressBar(temperatureColor())
+
         coolantValue:setForeground(valueLevelColor(reactor.coolantLevel))
-        coolantValue:setText(string.format("%d/%d", reactor.coolant.amount, _maxCoolant))
+                :setText(string.format("%d/%d", reactor.coolant.amount, _maxCoolant))
         fuelValue:setText(string.format("%d/%d", reactor.fuel.amount, _maxFuel))
-        fuelValue:setForeground(valueLevelColor(reactor.fuelLevel))
+                :setForeground(valueLevelColor(reactor.fuelLevel))
         heatedCoolantValue:setText(string.format("%d/%d", reactor.heatedCoolant.amount, _maxHeatedCoolant))
-        heatedCoolantValue:setForeground(valueLevelColor(reactor.heatedCoolantLevel))
+                :setForeground(valueLevelColor(reactor.heatedCoolantLevel))
         wasteValue:setText(string.format("%d/%d", reactor.waste.amount, _maxWaste))
-        wasteValue:setForeground(valueLevelColor(100 - reactor.wasteLevel))
+                :setForeground(valueLevelColor(100 - reactor.wasteLevel))
 
         -- Sleep (calls coroutine.yield() at the end)
-        os.sleep(0.5)
+        os.sleep(0.05)
     end
-end
-
-parallel.waitForAll(basalt.autoUpdate, updateScreen)
+end)
 
 -- while true do
 --     os.startTimer(0.8)  -- Basalt works event wise, create a timer loop to update values every now and then
