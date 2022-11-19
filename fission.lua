@@ -81,14 +81,14 @@ function reactor:getWasteName()
     return _itemNames[self.waste.name]
 end
 
-function temperatureColor()
+local function temperatureColor()
     if reactor.temperature >= _temperatureRed then return colors.red end
     if reactor.temperature >= _temperatureOrange then return colors.orange end
     if reactor.temperature >= _temperatureYellow then return colors.yellow end
     return colors.green
 end
 
-function valueLevelColor(color)
+local function valueLevelColor(color)
     if color < 5 then return colors.red end
     if color < 25 then return colors.orange end
     if color < 50 then return colors.yellow end
@@ -118,8 +118,8 @@ local mainFrame = basalt.createFrame()
     local startScramButton = mainFrame:addButton()
                                 :setPosition(3,11)
                                 :setSize(14,5)
-                                :setText(_buttonText[reactor.status])
-                                :setBackground(_buttonColor[reactor.status])
+                                :setText(_button.text[reactor.status])
+                                :setBackground(_button.color[reactor.status])
                                 :setFontSize(2)
                                 :onClick(function(self)
                                     if reactor.status == false then
@@ -249,7 +249,7 @@ while true do
     wasteValue:setForeground(valueLevelColor(100 - reactor.wasteLevel))
 
     -- Failsafe
-    
+
 
 
     local ev = table.pack(os.pullEvent())
