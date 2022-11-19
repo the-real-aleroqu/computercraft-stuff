@@ -21,6 +21,8 @@ local _itemNames = {
     ["minecraft:water"] = "Water",
     ["mekanism:sodium"] = "Sodium",
     ["mekanism:fissile_fuel"] = "Fissile Fuel",
+    ["mekanism:steam"] = "Steam",
+    ["mekanism:superheating_sodium"] = "Superheated Sodium",
     ["mekanism:nuclear_waste"] = "Nuclear Waste",
     ["minecraft:empty"] = "Empty",
     ["mekanism:empty"] = "Empty"
@@ -246,13 +248,27 @@ local valuesFrame = mainFrame:addFrame()
 --- Main Code
 
 basalt.onEvent(function(event)
+
     print(event)
-    if (event == "terminate") then
-        return false
-    end
 end)
 
-basalt.autoUpdate()
+parallel.waitForAll(basalt.autoUpdate(),
+function()
+    -- Update reactor object
+    reactor:updateValues()
+
+    -- Update Values on screen
+    coolantValue:setForeground(valueLevelColor(reactor.coolantLevel))
+    coolantValue:setText(string.format("%d/%d", reactor.coolant.amount, _maxCoolant))
+    fuelValue:setText(string.format("%d/%d", reactor.fuel.amount, _maxFuel))
+    fuelValue:setForeground(valueLevelColor(reactor.fuelLevel))
+    heatedCoolantValue:setText(string.format("%d/%d", reactor.heatedCoolant.amount, _maxHeatedCoolant))
+    heatedCoolantValue:setForeground(valueLevelColor(reactor.heatedCoolantLevel))
+    wasteValue:setText(string.format("%d/%d", reactor.waste.amount, _maxWaste))
+    wasteValue:setForeground(valueLevelColor(100 - reactor.wasteLevel))
+
+    -- Failsafe
+end)
 
 -- while true do
 --     os.startTimer(0.8)  -- Basalt works event wise, create a timer loop to update values every now and then
