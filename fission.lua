@@ -85,7 +85,7 @@ function reactor:getWasteName()
 end
 
 function reactor:temperaturePercentage()
-    return math.floor(180000 / self.temperature)    -- Returns percentage for the temperature bar (0-100)
+    return math.min(math.floor(self.temperature / 1800 * 100),100)    -- Returns percentage for the temperature bar (0-100)
 end
 
 local function temperatureColor()
@@ -123,8 +123,8 @@ local mainFrame = basalt.createFrame()
                                 :setFontSize(3)
 
     local startScramButton = mainFrame:addButton()
-                                :setPosition(3,11)
-                                :setSize(14,5)
+                                :setPosition(25,11)
+                                :setSize(15,3)
                                 :setText(_button.text[reactor.status])
                                 :setBackground(_button.color[reactor.status])
                                 :setBorder(colors.white)
