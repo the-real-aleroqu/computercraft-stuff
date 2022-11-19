@@ -246,23 +246,27 @@ local valuesFrame = mainFrame:addFrame()
 
 
 --- Main Code
-parallel.waitForAll(basalt.autoUpdate(),
-function()
-    -- Update reactor object
-    reactor:updateValues()
+local function updateScreen()
+    while true do
+        -- Update reactor object
+        reactor:updateValues()
 
-    -- Update Values on screen
-    coolantValue:setForeground(valueLevelColor(reactor.coolantLevel))
-    coolantValue:setText(string.format("%d/%d", reactor.coolant.amount, _maxCoolant))
-    fuelValue:setText(string.format("%d/%d", reactor.fuel.amount, _maxFuel))
-    fuelValue:setForeground(valueLevelColor(reactor.fuelLevel))
-    heatedCoolantValue:setText(string.format("%d/%d", reactor.heatedCoolant.amount, _maxHeatedCoolant))
-    heatedCoolantValue:setForeground(valueLevelColor(reactor.heatedCoolantLevel))
-    wasteValue:setText(string.format("%d/%d", reactor.waste.amount, _maxWaste))
-    wasteValue:setForeground(valueLevelColor(100 - reactor.wasteLevel))
+        -- Update Values on screen
+        coolantValue:setForeground(valueLevelColor(reactor.coolantLevel))
+        coolantValue:setText(string.format("%d/%d", reactor.coolant.amount, _maxCoolant))
+        fuelValue:setText(string.format("%d/%d", reactor.fuel.amount, _maxFuel))
+        fuelValue:setForeground(valueLevelColor(reactor.fuelLevel))
+        heatedCoolantValue:setText(string.format("%d/%d", reactor.heatedCoolant.amount, _maxHeatedCoolant))
+        heatedCoolantValue:setForeground(valueLevelColor(reactor.heatedCoolantLevel))
+        wasteValue:setText(string.format("%d/%d", reactor.waste.amount, _maxWaste))
+        wasteValue:setForeground(valueLevelColor(100 - reactor.wasteLevel))
 
-    -- Failsafe
-end)
+        -- Sleep (calls coroutine.yield() at the end)
+        os.sleep(0.5)
+    end
+end
+
+parallel.waitForAll(basalt.autoUpdate, updateScreen)
 
 -- while true do
 --     os.startTimer(0.8)  -- Basalt works event wise, create a timer loop to update values every now and then
