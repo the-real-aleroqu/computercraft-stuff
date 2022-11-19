@@ -97,18 +97,19 @@ function reactor:getWasteName()
     return _itemNames[self.waste.name]
 end
 
-local function temperatureColor()
-    if reactor.temperature >= _temperatureRed then return colors.red end
-    if reactor.temperature >= _temperatureOrange then return colors.orange end
-    if reactor.temperature >= _temperatureYellow then return colors.yellow end
-    return colors.green
-end
-
 function reactor:addBurnRate(value)
     local newBurnRate = self.burnRate + value
     if pcall(adapter.setBurnRate(newBurnRate)) then
         self.burnRate = newBurnRate
     end
+end
+
+
+local function temperatureColor()
+    if reactor.temperature >= _temperatureRed then return colors.red end
+    if reactor.temperature >= _temperatureOrange then return colors.orange end
+    if reactor.temperature >= _temperatureYellow then return colors.yellow end
+    return colors.green
 end
 
 local function damageColor()
