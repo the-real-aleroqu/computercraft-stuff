@@ -134,7 +134,7 @@ local valuesFrame = mainFrame:addFrame()
     local coolantName = valuesFrame:addLabel()
                                 :setPosition(5,14)
                                 :setText(reactor:getFuelName())
-                                :--setBackground(colors.gray)
+                                --:setBackground(colors.gray)
 
     local coolantValue = valuesFrame:addLabel()
                                 :setPosition(4,15)
