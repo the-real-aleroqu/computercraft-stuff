@@ -26,9 +26,15 @@ local _itemNames = {
     ["mekanism:empty"] = "Empty"
 }
 
-local _buttonText = {
-    [false] = "Start",
-    [true] = "SCRAM"
+local _button = {
+    text = {
+        [false] = "Start",
+        [true] = "SCRAM"
+    },
+    color = {
+        [false] = colors.green,
+        [true] = colors.red
+    }
 }
 
 --- Reactor object (internal values, object methods)
@@ -99,7 +105,8 @@ local mainFrame = basalt.createFrame()
                             :setBackground(colors.black)
                             :setTheme({
                                 LabelBG = colors.black,
-                                LabelText = colors.white
+                                LabelText = colors.white,
+                                ButtonText = colors.white
                             })
 
     --- Title
@@ -109,21 +116,37 @@ local mainFrame = basalt.createFrame()
                                 :setFontSize(3)
 
     local startScramButton = mainFrame:addButton()
-                                :setPosition(3,8)
-                                :setSize(9,3)
+                                :setPosition(3,11)
+                                :setSize(14,5)
                                 :setText(_buttonText[reactor.status])
+                                :setBackground(_buttonColor[reactor.status])
+                                :setFontSize(2)
+                                :onClick(function(self)
+                                    if reactor.status == false then
+                                        adapter.activate()
+                                        reactor.status = true
+                                    else
+                                        adapter.scram()
+                                        reactor.status = false
+                                    end
+                                    self:setText(_button.text[reactor.status])
+                                    self:setBackground(_button.color[reactor.status])
+                                end)
 
     local temperatureLabel = mainFrame:addLabel()
-                                :setPosition(3,12)
+                                :setPosition(3,17)
                                 :setText("Temperature:")
+                                :setFontSize(2)
     
     local temperatureValue = mainFrame:addLabel()
-                                :setPosition(16,12)
+                                :setPosition(48,17)
                                 :setText(string.format("%.1fK", reactor.temperature))
                                 :setForeground(temperatureColor())
+                                :setFontSize(2)
 
     local temperatureBar = mainFrame:addProgressbar()
-                                :setPosition(2,13)
+                                :setPosition(2,22)
+                                :setSize()
                                 :setForeground(temperatureColor())
 
 --- Values Frame
@@ -151,16 +174,16 @@ local valuesFrame = mainFrame:addFrame()
                                 :setText(string.format("%d/%d", reactor.coolant.amount, _maxCoolant))
 
     --- Fuel
-    local coolantTitle = valuesFrame:addLabel()
+    local fuelTitle = valuesFrame:addLabel()
                                 :setPosition(2,10)
                                 :setText("Fuel")
                                 :setFontSize(2)
 
-    local coolantName = valuesFrame:addLabel()
+    local fuelName = valuesFrame:addLabel()
                                 :setPosition(5,14)
                                 :setText(reactor:getFuelName())
 
-    local coolantValue = valuesFrame:addLabel()
+    local fuelValue = valuesFrame:addLabel()
                                 :setPosition(4,15)
                                 :setText(string.format("%d/%d", reactor.fuel.amount, _maxFuel))
                                 :setForeground(valueLevelColor(reactor.fuelLevel))
@@ -207,9 +230,28 @@ local valuesFrame = mainFrame:addFrame()
                                 :setText(string.format("%d/%d", reactor.waste.amount, _maxWaste))
                                 :setForeground(valueLevelColor(100 - reactor.wasteLevel))
 
+
+--- Main Code
 while true do
     os.startTimer(0.8)  -- Basalt works event wise, create a timer loop to update values every now and then
+    
+    -- Update reactor object
     reactor:updateValues()
+
+    -- Update Values on screen
+    coolantValue:setForeground(valueLevelColor(reactor.coolantLevel))
+    coolantValue:setText(string.format("%d/%d", reactor.coolant.amount, _maxCoolant))
+    fuelValue:setText(string.format("%d/%d", reactor.fuel.amount, _maxFuel))
+    fuelValue:setForeground(valueLevelColor(reactor.fuelLevel))
+    heatedCoolantValue:setText(string.format("%d/%d", reactor.heatedCoolant.amount, _maxHeatedCoolant))
+    heatedCoolantValue:setForeground(valueLevelColor(reactor.heatedCoolantLevel))
+    wasteValue:setText(string.format("%d/%d", reactor.waste.amount, _maxWaste))
+    wasteValue:setForeground(valueLevelColor(100 - reactor.wasteLevel))
+
+    -- Failsafe
+    
+
+
     local ev = table.pack(os.pullEvent())
     basalt.update(table.unpack(ev))
 end
