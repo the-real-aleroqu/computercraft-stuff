@@ -157,7 +157,7 @@ local mainFrame = basalt.createFrame()
     --- Temperature
     local temperatureLabel = mainFrame:addLabel()
                                 :setPosition(3,17)
-                                :setText("Temperature:")
+                                :setText("Temperature")
                                 :setFontSize(2)
 
     local temperatureValue = mainFrame:addLabel()
@@ -180,9 +180,37 @@ local mainFrame = basalt.createFrame()
 
     local damageValue = mainFrame:addLabel()
                                 :setPosition(25,25)
-                                :setText(string.format("%3d%%", reactor.damage))
+                                :setText(string.format("%d%%", reactor.damage))
                                 :setForeground(damageColor())
                                 :setFontSize(2)
+
+    --- Burn Rate
+    local burnRateLabel = mainFrame:addLabel()
+                                :setPosition(3,30)
+                                :setText("Burn Rate:")
+                                :setFontSize(2)
+
+    local burnRateValue = mainFrame:addLabel()
+                                :setPosition(34,30)
+                                :setText(string.format(".1f"))
+                                :setFontSize(2)
+
+    local rateBigDecrement = mainFrame:addButton()
+                                :setPosition(5,34)
+                                :setSize(3,2)
+                                :setText("<<")
+    local rateSmallDecrement = mainFrame:addButton()
+                                :setPosition(9,34)
+                                :setSize(3,2)
+                                :setText("<")
+    local rateSmallIncrement = mainFrame:addButton()
+                                :setPosition(16,34)
+                                :setSize(3,2)
+                                :setText(">")
+    local rateBigIncrement = mainFrame:addButton()
+                                :setPosition(20,34)
+                                :setSize(3,2)
+                                :setText(">>")
 
 --- Values Frame
 local valuesFrame = mainFrame:addFrame()
@@ -263,6 +291,14 @@ local valuesFrame = mainFrame:addFrame()
                                 :setText(string.format("%d/%d", reactor.waste.amount, _maxWaste))
                                 :setForeground(valueLevelColor(100 - reactor.wasteLevel))
 
+--- Clears Screen if Program Terminates and adds Failsafe if a Peripheral Detaches
+basalt.onEvent(function(event)
+    if event == "peripheral_detach" then os.queueEvent("terminate") return end
+    if event == "terminate" then
+        monitor.clear()
+        return true
+    end
+end)
 
 --- Main Code
 parallel.waitForAny(basalt.autoUpdate,
@@ -281,7 +317,7 @@ function()
                 :setForeground(temperatureColor)
         temperatureBar:setProgress(reactor:temperaturePercentage())
                 :setProgressBar(temperatureColor)
-        damageValue:setText(string.format("%3d%%", reactor.damage))
+        damageValue:setText(string.format("%d%%", reactor.damage))
                 :setForeground(damageColor)
         coolantName:setText(reactor:getCoolantName())
         coolantValue:setText(string.format("%d/%d", reactor.coolant.amount, _maxCoolant))
@@ -307,7 +343,7 @@ function()
 
         -- Restart Reactor
         else
-            if temperatureColor ~= colors.red and damageColor == colors.green then
+            if coolantLevelColor ~= colors.red and temperatureColor ~= colors.red and damageColor == colors.green then
                 pcall(adapter.activate)
                 reactor.status = true
                 startScramButton:setText(_button.text[reactor.status])
