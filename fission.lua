@@ -125,11 +125,10 @@ local mainFrame = basalt.createFrame()
                                 :setFontSize(3)
 
     local startScramButton = mainFrame:addButton()
-                                :setPosition(25,11)
+                                :setPosition(26,12)
                                 :setSize(15,3)
                                 :setText(_button.text[reactor.status])
                                 :setBackground(_button.color[reactor.status])
-                                :setBorder(colors.white)
                                 :onClick(function(self)
                                     if reactor.status == false then
                                         adapter.activate()
@@ -261,19 +260,24 @@ function()
                 :setForeground(temperatureColor)
         temperatureBar:setProgress(reactor:temperaturePercentage())
                 :setProgressBar(temperatureColor)
+        coolantName:setText(reactor:getCoolantName())
         coolantValue:setText(string.format("%d/%d", reactor.coolant.amount, _maxCoolant))
                 :setForeground(coolantLevelColor)
+        fuelName:setText(reactor:getFuelName())
         fuelValue:setText(string.format("%d/%d", reactor.fuel.amount, _maxFuel))
                 :setForeground(valueLevelColor(reactor.fuelLevel))
+        heatedCoolantName:setText(reactor:getHeatedCoolantName())
         heatedCoolantValue:setText(string.format("%d/%d", reactor.heatedCoolant.amount, _maxHeatedCoolant))
                 :setForeground(valueLevelColor(reactor.heatedCoolantLevel))
+        wasteName:setText(reactor:getWasteName())
         wasteValue:setText(string.format("%d/%d", reactor.waste.amount, _maxWaste))
                 :setForeground(wasteLevelColor)
 
         -- Failsafe
         if reactor.status then
             if temperatureColor == colors.red or coolantLevelColor == colors.red or wasteLevelColor == colors.red then
-                adapter.scram()
+                pcall(adapter.scram())
+                reactor.status = false
                 startScramButton:setText(_button.text[reactor.status])
                 startScramButton:setBackground(_button.color[reactor.status])
             end
