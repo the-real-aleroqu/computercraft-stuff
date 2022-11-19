@@ -271,10 +271,12 @@ function()
                 :setForeground(wasteLevelColor)
 
         -- Failsafe
-        if reactor.status and temperatureColor == colors.red or coolantLevelColor == colors.red or wasteLevelColor == colors.red then
-            adapter.scram()
-            startScramButton:setText(_button.text[reactor.status])
-            startScramButton:setBackground(_button.color[reactor.status])
+        if reactor.status then
+            if temperatureColor == colors.red or coolantLevelColor == colors.red or wasteLevelColor == colors.red then
+                adapter.scram()
+                startScramButton:setText(_button.text[reactor.status])
+                startScramButton:setBackground(_button.color[reactor.status])
+            end
         end
     end
 end)
